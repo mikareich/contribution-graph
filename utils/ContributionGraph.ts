@@ -6,45 +6,10 @@ import {
   ContributionYear,
   getContributionsByDate,
 } from "./getContributions";
-
-//@ts-ignore
-Date.prototype.getWeek = function () {
-  var date = new Date(this.getTime());
-  date.setHours(0, 0, 0, 0);
-  // Thursday in current week decides the year.
-  date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-  // January 4 is always in week 1.
-  var week1 = new Date(date.getFullYear(), 0, 4);
-  // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-  return (
-    1 +
-    Math.round(
-      ((date.getTime() - week1.getTime()) / 86400000 -
-        3 +
-        ((week1.getDay() + 6) % 7)) /
-        7
-    )
-  );
-};
-
-interface ColorPalette {
-  background: string;
-  text: string;
-  textLight: string;
-  levels: [string, string, string, string, string];
-}
-
-const DEFAULT_COLOR_PALETTE: ColorPalette = {
-  background: "#ffffff",
-  text: "#000000",
-  textLight: "#666666",
-  levels: ["#ebedf0", "#c6e48b", "#7bc96f", "#239a3b", "#196127"],
-};
+import { ColorTheme, GITHUB_LIGHT } from "./themes";
 
 const measureText = (ctx: CanvasRenderingContext2D, text: string) => {
   const metrics = ctx.measureText(text);
-
-  console.log(text, metrics);
 
   const width = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
   const height = metrics.actualBoundingBoxDescent;
@@ -93,7 +58,7 @@ class ContributionGraph {
 
   public readonly username: string;
 
-  public readonly colorPalette: ColorPalette;
+  public readonly colorTheme: ColorTheme;
 
   public readonly ctx: CanvasRenderingContext2D;
 
@@ -127,14 +92,14 @@ class ContributionGraph {
   constructor(
     username: string,
     contributions: ContributionYear[],
-    colorPalette: ColorPalette = DEFAULT_COLOR_PALETTE,
+    colorPalette: ColorTheme = GITHUB_LIGHT,
     scale: number = 2
   ) {
     this.contributions = contributions.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
     this.username = username;
-    this.colorPalette = colorPalette;
+    this.colorTheme = colorPalette;
 
     // calucalte width and height
     this.width =
@@ -163,16 +128,16 @@ class ContributionGraph {
   }
 
   drawBackground() {
-    const { ctx, colorPalette } = this;
-    const { background } = colorPalette;
+    const { ctx, colorTheme } = this;
+    const { background } = colorTheme;
 
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   drawHeader() {
-    const { ctx, colorPalette } = this;
-    const { text, textLight } = colorPalette;
+    const { ctx, colorTheme } = this;
+    const { text, textLight } = colorTheme;
     const { padding, fontFamily, typeScale, boxSize, boxMargin } =
       ContributionGraph.OPTIONS;
 
@@ -225,7 +190,7 @@ class ContributionGraph {
 
     // draw line
     const lineY = padding + headerHeight + 10;
-    ctx.strokeStyle = colorPalette.levels[0];
+    ctx.strokeStyle = colorTheme.contributionLevels[0];
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padding, lineY);
@@ -234,13 +199,12 @@ class ContributionGraph {
   }
 
   drawYear(contributionYear: ContributionYear, yCoord: number) {
-    const { ctx, colorPalette } = this;
+    const { ctx, colorTheme: colorPalette } = this;
     const { text, textLight } = colorPalette;
     const { padding, fontFamily, typeScale, boxSize, boxMargin } =
       ContributionGraph.OPTIONS;
 
-    const { MONTHS_OF_YEAR, NUMBER_OF_WEEKS, NUMBER_OF_DAYS } =
-      ContributionGraph;
+    const { MONTHS_OF_YEAR, NUMBER_OF_DAYS } = ContributionGraph;
 
     const contributionDate = new Date(contributionYear.date);
     const fullYear = contributionDate.getFullYear();
@@ -248,7 +212,7 @@ class ContributionGraph {
 
     // draw year text
 
-    ctx.font = `${typeScale.body}rem ${fontFamily}`;
+    ctx.font = `${typeScale.small}rem ${fontFamily}`;
     ctx.fillStyle = text;
 
     const yearText = `${fullYear.toString()}: ${
@@ -272,8 +236,6 @@ class ContributionGraph {
     const monthSizes = MONTHS_OF_YEAR.map((month) => measureText(ctx, month));
     const monthHeight = Math.max(...monthSizes.map((size) => size.height));
     const monthBaseline = yearBaseline + yearHeight + 10;
-
-    const monthXCoord = [];
 
     // draw contributions
 
@@ -341,11 +303,11 @@ class ContributionGraph {
     x: number,
     y: number
   ) {
-    const { ctx, colorPalette } = this;
-    const { levels } = colorPalette;
+    const { ctx, colorTheme: colorPalette } = this;
+    const { contributionLevels } = colorPalette;
     const { boxSize } = ContributionGraph.OPTIONS;
 
-    ctx.fillStyle = levels[level];
+    ctx.fillStyle = contributionLevels[level];
     ctx.fillRect(x, y, boxSize, boxSize);
   }
 

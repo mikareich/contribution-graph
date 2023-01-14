@@ -1,0 +1,20 @@
+* {
+  box-sizing: border-box;
+  transition: background-color 200ms;
+}
+
+body {
+  margin: 0;
+  width: 100vw;
+}
+
+.App {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}

@@ -64,31 +64,29 @@ export default async function getContributions(
   username: string,
   year: number
 ): Promise<ContributionYear> {
-  try {
-    const from = new Date(year, 0, 1).toISOString();
-    const to = new Date(year, 11, 31).toISOString();
+  const from = new Date(year, 0, 1).toISOString();
+  const to = new Date(year, 11, 31).toISOString();
 
-    console.log(from, to);
+  const { data } = await client.query({
+    query: CONTRIBUTIONS_BY_YEAR(username, from, to),
+  });
 
-    const { data } = await client.query({
-      query: CONTRIBUTIONS_BY_YEAR(username, from, to),
-    });
+  // format raw data
+  const yearlyContributionCount =
+    data.user.contributionsCollection.contributionCalendar.totalContributions;
 
-    // format raw data
-    const yearlyContributionCount =
-      data.user.contributionsCollection.contributionCalendar.totalContributions;
+  const rawLevels = [
+    "NONE",
+    "FIRST_QUARTILE",
+    "SECOND_QUARTILE",
+    "THIRD_QUARTILE",
+    "FOURTH_QUARTILE",
+  ];
 
-    const rawLevels = [
-      "NONE",
-      "FIRST_QUARTILE",
-      "SECOND_QUARTILE",
-      "THIRD_QUARTILE",
-      "FOURTH_QUARTILE",
-    ];
-
-    // format weeks
-    const contributionWeeks: ContributionWeek[] =
-      data.user.contributionsCollection.contributionCalendar.weeks.map(
+  // format weeks
+  const contributionWeeks: ContributionWeek[] =
+    data.user.contributionsCollection.contributionCalendar.weeks
+      .map(
         (week: any) => {
           let weeklyContributionCount = 0;
           // format days
@@ -113,18 +111,16 @@ export default async function getContributions(
             date: new Date(week.contributionDays[0].date).toISOString(),
           };
         }
-      );
+        // filter out weeks with no contributions
+      )
+      .filter((week: ContributionWeek) => week.contributionCount > 0);
 
-    // format year
-    const contributionYear: ContributionYear = {
-      contributionCount: yearlyContributionCount,
-      contributionWeeks,
-      date: new Date(year, 0, 1).toISOString(),
-    };
+  // format year
+  const contributionYear: ContributionYear = {
+    contributionCount: yearlyContributionCount,
+    contributionWeeks,
+    date: new Date(year, 0, 1).toISOString(),
+  };
 
-    return contributionYear;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  return contributionYear;
 }

@@ -5,7 +5,6 @@ import {
   createHttpLink,
   InMemoryCache,
 } from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
 
 const { GITHUB_API_URL, GITHUB_TOKEN } = process.env;
 

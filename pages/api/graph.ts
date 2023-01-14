@@ -1,27 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import generateGraph from "../../utils/generateGraph";
-import getContributions, {
-  ContributionYear,
-} from "../../utils/getContributions";
+import ContributionGraph from "../../utils/ContributionGraph";
+import getAllContributions from "../../utils/getAllContributions";
+import themes from "../../utils/themes";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<string | { error: string }>
 ) {
-  const { username } = req.query;
+  const { username, theme: themeName } = req.query as {
+    username: string;
+    theme?: string;
+  };
+  const theme = themes.find((theme) => theme.name === themeName);
 
   try {
     if (!username) {
       throw new Error("Missing username");
     }
 
-    const years = [2018, 2016, 2019, 2020, 2022, 2023];
-    const contributions = await Promise.all(
-      years.map((year) => getContributions(username as string, year))
-    );
+    const contributions = await getAllContributions(username as string);
+    const graph = new ContributionGraph(username, contributions, theme);
 
-    const graph = generateGraph(username as string, contributions);
-    const data = graph.replace(/^data:image\/png;base64,/, "");
+    const data = graph
+      .generateImageDataURL()
+      .replace(/^data:image\/png;base64,/, "");
     const buffer = Buffer.from(data, "base64");
 
     res.setHeader("Content-Type", "image/png");
