@@ -1,8 +1,12 @@
 import { gql } from "@apollo/client";
 import client from "./apolloClient";
 
+export const CONTIBUTION_LEVELS = [0, 1, 2, 3, 4] as const;
+
+export type ContributionLevel = typeof CONTIBUTION_LEVELS[number];
+
 export interface ContributionDay {
-  contributionLevel: string;
+  contributionLevel: ContributionLevel;
   contributionCount: number;
   date: string;
 }
@@ -19,10 +23,28 @@ export interface ContributionYear {
   date: string;
 }
 
-const CONTRIBUTIONS_BY_YEAR = (username: string) => gql`
+export const getContributionsByDate = (
+  contributions: ContributionDay[],
+  date: Date
+): ContributionDay | undefined => {
+  return contributions.find((contribution) => {
+    const contributionDate = new Date(contribution.date);
+    return (
+      contributionDate.getFullYear() === date.getFullYear() &&
+      contributionDate.getMonth() === date.getMonth() &&
+      contributionDate.getDate() === date.getDate()
+    );
+  });
+};
+
+const CONTRIBUTIONS_BY_YEAR = (
+  username: string,
+  from: string,
+  to: string
+) => gql`
   query {
     user(login: "${username}") {
-      contributionsCollection {
+      contributionsCollection(from: "${from}", to: "${to}") {
         contributionCalendar {
           totalContributions
           weeks {
@@ -43,13 +65,26 @@ export default async function getContributions(
   year: number
 ): Promise<ContributionYear> {
   try {
+    const from = new Date(year, 0, 1).toISOString();
+    const to = new Date(year, 11, 31).toISOString();
+
+    console.log(from, to);
+
     const { data } = await client.query({
-      query: CONTRIBUTIONS_BY_YEAR(username),
+      query: CONTRIBUTIONS_BY_YEAR(username, from, to),
     });
 
     // format raw data
     const yearlyContributionCount =
       data.user.contributionsCollection.contributionCalendar.totalContributions;
+
+    const rawLevels = [
+      "NONE",
+      "FIRST_QUARTILE",
+      "SECOND_QUARTILE",
+      "THIRD_QUARTILE",
+      "FOURTH_QUARTILE",
+    ];
 
     // format weeks
     const contributionWeeks: ContributionWeek[] =
@@ -57,17 +92,20 @@ export default async function getContributions(
         (week: any) => {
           let weeklyContributionCount = 0;
           // format days
-          const contributionDays: ContributionDay[] = week.contributionDays.map(
-            (day: any) => {
+          const contributionDays: ContributionDay[] = week.contributionDays
+            .map((day: any) => {
               weeklyContributionCount += day.contributionCount;
+
+              const level = rawLevels.indexOf(day.contributionLevel);
 
               return {
                 contributionCount: day.contributionCount,
-                contributionLevel: day.contributionLevel,
+                contributionLevel: level,
                 date: new Date(day.date).toISOString(),
               };
-            }
-          );
+            })
+            // filter out days with no contributions
+            .filter((day: ContributionDay) => day.contributionCount > 0);
 
           return {
             contributionCount: weeklyContributionCount,
@@ -86,6 +124,7 @@ export default async function getContributions(
 
     return contributionYear;
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }

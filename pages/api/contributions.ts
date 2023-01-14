@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import generateGraph from "../../utils/generateGraph";
 import getContributions, {
   ContributionYear,
 } from "../../utils/getContributions";
@@ -7,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ContributionYear | { error: string }>
 ) {
-  const { username, year } = req.body;
+  const { username, year } = req.query;
 
   try {
     if (!username || !year) {

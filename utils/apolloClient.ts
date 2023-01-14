@@ -10,7 +10,7 @@ import { setContext } from "@apollo/client/link/context";
 const { GITHUB_API_URL, GITHUB_TOKEN } = process.env;
 
 const httpLink = createHttpLink({
-  uri: "https://api.github.com/graphql",
+  uri: GITHUB_API_URL,
 });
 
 /* It's a middleware that adds the authorization to the headers. */
