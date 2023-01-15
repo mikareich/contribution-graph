@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTheme } from "../components/ThemeProvider";
 import ContributionGraph from "../utils/ContributionGraph";
+import Head from "next/head";
 
 const generateContributionsURL = (username: string) =>
   `/api/contributions?username=${username}`;
@@ -29,10 +30,11 @@ const generateImageURL = async (username: string, theme: ColorTheme) => {
 
 export default function Home() {
   const [currentTheme, setTheme] = useTheme();
-  const [username, setUsername] = useState("mikareich");
+  const [username, setUsername] = useState("");
   const [imageURL, setImageURL] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [blobURL, setBlobURL] = useState("");
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const changeTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const theme = themes.find((theme) => theme.name === e.target.value);
@@ -44,6 +46,7 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("loading");
+    setFirstLoad(false);
 
     try {
       const url = await generateImageURL(username, currentTheme);
@@ -59,6 +62,14 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <Head>
+        <title>GitHub Contribution Graph</title>
+        <meta
+          name="description"
+          content="Generate your own GitHub contribution graph image with custom colors!"
+        />
+      </Head>
+
       <header className={styles.header}>
         <h1 className={styles.title}>GitHub Contribution Graph</h1>
         <h3 className={styles.subtitle}>
@@ -127,7 +138,7 @@ export default function Home() {
           </p>
         )}
 
-        {status === "idle" && (
+        {status === "idle" && !firstLoad && (
           <Image
             className={`${styles.image}`}
             src={imageURL}
