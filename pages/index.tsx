@@ -4,20 +4,35 @@ import themes, { ColorTheme } from "../utils/themes";
 import { useState } from "react";
 import Link from "next/link";
 import { useTheme } from "../components/ThemeProvider";
-
-const generateImageURL = (username: string, theme: ColorTheme) =>
-  `/api/graph?username=${username}&theme=${theme.name}`;
+import ContributionGraph from "../utils/ContributionGraph";
 
 const generateContributionsURL = (username: string) =>
   `/api/contributions?username=${username}`;
+
+// generates base64 image data url
+const generateImageURL = async (username: string, theme: ColorTheme) => {
+  const canvas = document.createElement("canvas");
+
+  const contributionRes = await fetch(generateContributionsURL(username));
+  const contributions = await contributionRes.json();
+
+  const graph = new ContributionGraph(
+    username,
+    contributions || [],
+    theme,
+    2,
+    canvas
+  );
+
+  return graph.generateImageDataURL();
+};
 
 export default function Home() {
   const [currentTheme, setTheme] = useTheme();
   const [username, setUsername] = useState("mikareich");
   const [imageURL, setImageURL] = useState("");
-  const [firstLoad, setFirstLoad] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [blobURL, setBlobURL] = useState("");
 
   const changeTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const theme = themes.find((theme) => theme.name === e.target.value);
@@ -26,28 +41,20 @@ export default function Home() {
     setTheme(theme);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setStatus("loading");
 
-    setLoading(true);
-    setError(false);
-    setFirstLoad(false);
+    try {
+      const url = await generateImageURL(username, currentTheme);
+      setImageURL(url);
+      setStatus("idle");
 
-    setImageURL(generateImageURL(username, currentTheme!));
-  };
-
-  const handleImageLoad = () => {
-    setError(false);
-    setLoading(false);
-  };
-
-  const handleImageError = () => {
-    if (firstLoad) return;
-
-    console.log("error");
-
-    setLoading(false);
-    setError(true);
+      const blob = await fetch(url).then((res) => res.blob());
+      setBlobURL(URL.createObjectURL(blob));
+    } catch (e) {
+      setStatus("error");
+    }
   };
 
   return (
@@ -94,15 +101,9 @@ export default function Home() {
       <p className={styles.description}>
         Please enter a GitHub username and select a theme to generate your
         GitHub Contribution Graph. You can also fetch the{" "}
-        <Link
-          target="_blank"
-          href={generateImageURL(
-            username || "YOUR_USERNAME_HERE",
-            currentTheme!
-          )}
-        >
+        <a target="_blank" href={blobURL} rel="noreferrer">
           image
-        </Link>{" "}
+        </a>{" "}
         and{" "}
         <Link
           target="_blank"
@@ -115,28 +116,25 @@ export default function Home() {
       </p>
 
       <section className={styles.imageSection}>
-        {!firstLoad && (
-          <>
-            <Image
-              className={`${styles.image}`}
-              src={imageURL}
-              alt="GitHub Contribution Graph"
-              width={1040}
-              height={240}
-              onLoadingComplete={handleImageLoad}
-              onError={handleImageError}
-              style={{ width: loading || error ? "0.01px" : "100%" }}
-            />
-            {error && (
-              <p className={styles.error}>
-                There was an error loading the image. Please check your username
-                and try later again.
-              </p>
-            )}
-            {loading && (
-              <p className={styles.loading}>Generating your graph...</p>
-            )}
-          </>
+        {status === "loading" && (
+          <p className={styles.loading}>Generating your graph...</p>
+        )}
+
+        {status === "error" && (
+          <p className={styles.error}>
+            There was an error loading the image. Please check your username and
+            try later again.
+          </p>
+        )}
+
+        {status === "idle" && (
+          <Image
+            className={`${styles.image}`}
+            src={imageURL}
+            alt={`GitHub contribution graph for ${username}`}
+            width={1}
+            height={1}
+          />
         )}
       </section>
     </div>

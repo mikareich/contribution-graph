@@ -1,4 +1,3 @@
-import { createCanvas, CanvasRenderingContext2D, Canvas } from "canvas";
 import {
   CONTIBUTION_LEVELS,
   ContributionDay,
@@ -62,7 +61,7 @@ class ContributionGraph {
 
   public readonly ctx: CanvasRenderingContext2D;
 
-  public readonly canvas: Canvas;
+  public readonly canvas: HTMLCanvasElement;
 
   public readonly width: number;
 
@@ -93,7 +92,8 @@ class ContributionGraph {
     username: string,
     contributions: ContributionYear[],
     colorPalette: ColorTheme = GITHUB_LIGHT,
-    scale: number = 2
+    scale: number = 2,
+    canvas: HTMLCanvasElement
   ) {
     this.contributions = contributions.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -115,8 +115,11 @@ class ContributionGraph {
       2 * ContributionGraph.OPTIONS.padding;
 
     // create canvas
-    this.canvas = createCanvas(this.width * scale, this.height * scale);
-    this.ctx = this.canvas.getContext("2d");
+    this.canvas = canvas;
+    this.canvas.width = this.width * scale;
+    this.canvas.height = this.height * scale;
+
+    this.ctx = this.canvas.getContext("2d")!;
 
     this.ctx.scale(scale, scale);
 
@@ -311,8 +314,8 @@ class ContributionGraph {
     ctx.fillRect(x, y, boxSize, boxSize);
   }
 
-  generateImageDataURL() {
-    return this.canvas.toDataURL();
+  generateImageDataURL(type: string = "image/png", quality: number = 1) {
+    return this.canvas.toDataURL(type, quality);
   }
 }
 
