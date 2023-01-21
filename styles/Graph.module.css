@@ -1,0 +1,13 @@
+.container {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-color);
+  font-size: 0.875rem;
+  color: var(--text-color-light);
+  flex-grow: 1;
+}
+
+.graph {
+  width: 100%;
+  height: fit-content;
+}

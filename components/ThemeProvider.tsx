@@ -11,7 +11,7 @@ import {
 import { ColorTheme } from "../utils/themes";
 
 interface ThemeProviderProps {
-  theme: ColorTheme;
+  initialTheme: ColorTheme;
   font: NextFontWithVariable;
 }
 
@@ -26,40 +26,39 @@ export const useTheme = () => {
 };
 
 export default function ThemeProvider({
-  theme,
+  initialTheme,
   font,
   children,
 }: PropsWithChildren<ThemeProviderProps>) {
-  const [currentTheme, setTheme] = useState(theme);
-  const [cssVariables, setCssVariables] = useState<Record<string, string>>({});
+  const [theme, setTheme] = useState(initialTheme);
 
   useEffect(() => {
-    if (!currentTheme) return;
+    if (!theme) return;
 
-    setCssVariables(() => {
-      const variables: typeof cssVariables = {
-        "--primary-color": currentTheme.primary,
-        "--text-color": currentTheme.text,
-        "--text-color-light": currentTheme.textLight,
-        "--text-on-primary-color": currentTheme.textOnPrimary,
-        "--link-color": currentTheme.link,
-        "--background-color": currentTheme.background,
-        "--border-color": currentTheme.border,
-      };
+    const variables: Record<string, string> = {
+      "--primary-color": theme.primary,
+      "--text-color": theme.text,
+      "--text-color-light": theme.textLight,
+      "--text-on-primary-color": theme.textOnPrimary,
+      "--link-color": theme.link,
+      "--background-color": theme.background,
+      "--border-color": theme.border,
+    };
 
-      currentTheme.contributionLevels.forEach((level, index) => {
-        variables[`--contribution-level-${index + 1}`] = level;
-      });
-
-      return variables;
+    theme.contributionLevels.forEach((level, index) => {
+      variables[`--contribution-level-${index + 1}`] = level;
     });
-  }, [currentTheme]);
+
+    Object.entries(variables).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(key, value);
+    });
+
+    document.documentElement.classList.add(font.variable);
+  }, [theme, font]);
 
   return (
-    <ThemeContext.Provider value={[currentTheme, setTheme]}>
-      <div className={font.variable} style={cssVariables}>
-        {children}
-      </div>
+    <ThemeContext.Provider value={[theme, setTheme]}>
+      {children}
     </ThemeContext.Provider>
   );
 }

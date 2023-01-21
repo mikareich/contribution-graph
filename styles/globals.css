@@ -6,9 +6,6 @@
 body {
   margin: 0;
   width: 100vw;
-}
-
-.App {
   background-color: var(--background-color);
   color: var(--text-color);
   min-height: 100vh;
@@ -17,4 +14,14 @@ body {
 a {
   color: var(--link-color);
   text-decoration: none;
+}
+
+.container {
+  font-family: var(--ibm-plex-sans);
+  width: clamp(300px, 80vw, 800px);
+  margin: auto;
+  padding: 40px 20px 20px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }

@@ -13,10 +13,8 @@ const ibmPlexSans = IBM_Plex_Sans({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider theme={GITHUB_LIGHT} font={ibmPlexSans}>
-      <div className="App">
-        <Component {...pageProps} />
-      </div>
+    <ThemeProvider initialTheme={GITHUB_LIGHT} font={ibmPlexSans}>
+      <Component {...pageProps} />
     </ThemeProvider>
   );
 }
