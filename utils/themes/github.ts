@@ -3,6 +3,7 @@ import { ColorTheme } from "./index";
 export const GITHUB_LIGHT: ColorTheme = {
   name: "GitHub Light",
   primary: "#2da44e",
+  error: "#cb2431",
   background: "#ffffff",
   text: "#24292f",
   textLight: "#6e7781",
@@ -15,6 +16,7 @@ export const GITHUB_LIGHT: ColorTheme = {
 export const GITHUB_DARK: ColorTheme = {
   name: "GitHub Dark",
   primary: "#238636",
+  error: "#d73a49",
   background: "#0d1117",
   text: "#c9d1d9",
   textLight: "#6e7681",

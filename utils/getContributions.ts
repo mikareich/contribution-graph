@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import client from "./apolloClient";
 
-export const CONTIBUTION_LEVELS = [0, 1, 2, 3, 4] as const;
+export const CONTIBUTION_LEVELS = [-1, 0, 1, 2, 3, 4] as const;
 
 export type ContributionLevel = typeof CONTIBUTION_LEVELS[number];
 

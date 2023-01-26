@@ -3,6 +3,7 @@ import { ColorTheme } from "./index";
 const VSCODE: ColorTheme = {
   name: "Visual Studio Code",
   primary: "#3D8060",
+  error: "#F44336",
   background: "#1E1E1E",
   text: "#D4D4D4",
   textLight: "#9E9E9E",

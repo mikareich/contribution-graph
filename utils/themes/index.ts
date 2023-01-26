@@ -2,6 +2,7 @@ export interface ColorTheme {
   name: string;
 
   primary: string;
+  error: string;
 
   background: string;
 

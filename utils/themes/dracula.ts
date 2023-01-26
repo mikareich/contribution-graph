@@ -3,6 +3,7 @@ import { ColorTheme } from "./index";
 const DRACULA: ColorTheme = {
   name: "Dracula",
   primary: "#ff79c6",
+  error: "#ff5555",
   background: "#181818",
   text: "#f8f8f2",
   textLight: "#6272a4",

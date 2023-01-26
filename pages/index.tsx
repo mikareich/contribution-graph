@@ -1,8 +1,7 @@
 import styles from "../styles/Home.module.css";
 import themes from "../utils/themes";
 import { useState } from "react";
-import Link from "next/link";
-import { useTheme } from "../components/ThemeProvider";
+import { useBlobURL, useTheme } from "../components/ContextProvider";
 import Head from "next/head";
 import Graph from "../components/Graph";
 
@@ -12,7 +11,7 @@ const generateContributionsURL = (username: string) =>
 export default function Home() {
   const [currentTheme, setTheme] = useTheme();
   const [username, setUsername] = useState("");
-  const [blobURL, setBlobURL] = useState("");
+  const [blobURL] = useBlobURL();
 
   const changeTheme = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const theme = themes.find((theme) => theme.name === e.target.value);
@@ -24,8 +23,8 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const user = e.currentTarget.username.value;
-    if (user) setUsername(user);
+    const name = e.currentTarget.username.value;
+    if (name) setUsername(name);
   };
 
   return (

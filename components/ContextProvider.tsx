@@ -15,22 +15,32 @@ interface ThemeProviderProps {
   font: NextFontWithVariable;
 }
 
-const ThemeContext = createContext<
-  [ColorTheme, Dispatch<SetStateAction<ColorTheme>>] | null
->(null);
+interface Context {
+  theme: [ColorTheme, Dispatch<SetStateAction<ColorTheme>>];
+  blobURL: [string, Dispatch<SetStateAction<string>>];
+}
+
+const ThemeContext = createContext<Context | null>(null);
 
 export const useTheme = () => {
-  const [theme, setTheme] = useContext(ThemeContext)!;
+  const [theme, setTheme] = useContext(ThemeContext)!.theme;
 
   return [theme, setTheme] as const;
 };
 
-export default function ThemeProvider({
+export const useBlobURL = () => {
+  const [blobURL, setBlobURL] = useContext(ThemeContext)!.blobURL;
+
+  return [blobURL, setBlobURL] as const;
+};
+
+export default function ContextProvider({
   initialTheme,
   font,
   children,
 }: PropsWithChildren<ThemeProviderProps>) {
   const [theme, setTheme] = useState(initialTheme);
+  const [blobURL, setBlobURL] = useState("");
 
   useEffect(() => {
     if (!theme) return;
@@ -57,7 +67,12 @@ export default function ThemeProvider({
   }, [theme, font]);
 
   return (
-    <ThemeContext.Provider value={[theme, setTheme]}>
+    <ThemeContext.Provider
+      value={{
+        theme: [theme, setTheme],
+        blobURL: [blobURL, setBlobURL],
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

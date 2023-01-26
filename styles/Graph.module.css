@@ -5,6 +5,7 @@
   font-size: 0.875rem;
   color: var(--text-color-light);
   flex-grow: 1;
+  align-content: center;
 }
 
 .graph {

@@ -3,6 +3,7 @@ import { ColorTheme } from "./index";
 const MATERIAL_THEME: ColorTheme = {
   name: "Material Theme",
   primary: "#80CBC4",
+  error: "#F44336",
   background: "#263238",
   text: "#EEFFFF",
   textLight: "#546E7A",
