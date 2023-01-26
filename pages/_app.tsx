@@ -2,7 +2,7 @@ import "../styles/globals.css";
 
 import type { AppProps } from "next/app";
 import ContextProvider from "../components/ContextProvider";
-import { GITHUB_DARK } from "../utils/themes";
+import { GITHUB_LIGHT } from "../utils/themes";
 import { IBM_Plex_Sans } from "@next/font/google";
 
 const ibmPlexSans = IBM_Plex_Sans({
@@ -13,7 +13,7 @@ const ibmPlexSans = IBM_Plex_Sans({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ContextProvider initialTheme={GITHUB_DARK} font={ibmPlexSans}>
+    <ContextProvider initialTheme={GITHUB_LIGHT} font={ibmPlexSans}>
       <Component {...pageProps} />
     </ContextProvider>
   );
