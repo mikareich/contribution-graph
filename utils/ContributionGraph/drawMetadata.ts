@@ -77,6 +77,7 @@ function drawMetadata(
 
     let boxX = rightLegendX - legendDescriptionMargin;
     CONTIBUTION_LEVELS.forEach((level) => {
+      if (level === -1) return;
       boxX = boxX - contributionBox.spacing - contributionBox.size;
 
       drawContributionBox(
