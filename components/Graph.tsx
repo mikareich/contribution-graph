@@ -16,7 +16,7 @@ type Status = "completed" | "loading" | "error";
 function Graph({ username }: GraphProps) {
   const [theme] = useTheme();
   const [, setBlobURL] = useBlobURL();
-  const [status, setStatus] = useState<Status>("error");
+  const [status, setStatus] = useState<Status>();
   const [contributions, setContributions] = useState<ContributionYear[]>([]);
   const loadingCanvasRef = useRef<HTMLCanvasElement>(null);
   const errorCanvasRef = useRef<HTMLCanvasElement>(null);
