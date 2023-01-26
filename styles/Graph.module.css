@@ -2,7 +2,6 @@
   display: grid;
   place-items: center;
   border: 1px solid var(--border-color);
-  font-size: 0.875rem;
   color: var(--text-color-light);
   flex-grow: 1;
   align-content: center;
@@ -11,4 +10,13 @@
 .graph {
   width: 100%;
   height: fit-content;
+}
+
+.container *:not(.graph) {
+  margin: 10px;
+}
+
+.description {
+  font-size: 0.875rem;
+  text-align: center;
 }

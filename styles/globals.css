@@ -18,9 +18,9 @@ a {
 
 .container {
   font-family: var(--ibm-plex-sans);
-  width: clamp(300px, 80vw, 800px);
+  width: clamp(320px, 80vw, 800px);
   margin: auto;
-  padding: 40px 20px 20px 20px;
+  padding: 40px 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

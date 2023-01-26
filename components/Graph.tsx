@@ -83,18 +83,20 @@ function Graph({ username }: GraphProps) {
   return (
     <section className={styles.container}>
       {status === undefined && (
-        <p>Enter your GitHub username to generate your graph.</p>
+        <p className={styles.description}>
+          Enter your GitHub username to generate your graph.
+        </p>
       )}
       {status === "loading" && (
         <>
           <canvas ref={loadingCanvasRef} />
-          <p>Generating your graph...</p>
+          <p className={styles.description}>Generating your graph...</p>
         </>
       )}
       {status === "error" && (
         <>
           <canvas ref={errorCanvasRef} />
-          <p>
+          <p className={styles.description}>
             There was an error loading the image. Please check your username and
             try later again.
           </p>

@@ -1,27 +1,9 @@
-/* .container {
-  font-family: var(--ibm-plex-sans);
-  width: clamp(300px, 80vw, 800px);
-  margin: auto;
-  padding: 20px;
-  min-height: 100vh;
-  display: grid;
-  grid-template:
-    "header" 200px
-    "form" auto
-    "description" auto
-    "image" 1fr
-    / 1fr;
-
-  row-gap: 20px;
-} */
-
-/* HEADER */
-
 .header {
   display: grid;
   text-align: center;
   align-content: center;
-  height: 200px;
+  min-height: 200px;
+  margin-bottom: 10px;
 }
 
 .title {
@@ -86,4 +68,26 @@
   font-size: 0.875rem;
   color: var(--text-color-light);
   margin-bottom: 40px;
+}
+
+/* --- ON MOBILE --- */
+
+@media (max-width: 768px) {
+  .form {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 10px;
+  }
+
+  .header {
+    text-align: left;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1.125rem;
+  }
 }
